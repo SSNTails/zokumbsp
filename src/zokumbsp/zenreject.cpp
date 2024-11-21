@@ -2320,7 +2320,7 @@ void ProcessOptionsRMB ( const sRejectOptionRMB *rmb, int noSectors, int **dista
     }
 }
 
-bool CreateREJECT ( DoomLevel *level, const sRejectOptions &options, const sBlockMapOptions &blockMapOptions)
+bool CreateREJECT ( DoomLevel *level, const sRejectOptions &options, sBlockMapOptions &blockMapOptions)
 {
     FUNCTION_ENTRY ( NULL, "CreateREJECT", true );
 
@@ -2341,7 +2341,10 @@ bool CreateREJECT ( DoomLevel *level, const sRejectOptions &options, const sBloc
     if ( SetupLines ( level )) {
 
         // Set up a scaled BLOCKMAP type structure
+        bool wasTwoFiftySix = blockMapOptions.TwoFiftySix;
+        blockMapOptions.TwoFiftySix = false;
         PrepareBLOCKMAP ( level, blockMapOptions );
+        blockMapOptions.TwoFiftySix = wasTwoFiftySix;
 
         // Make a list of which sectors contain others and their boundary lines
         sSector *sector = CreateSectorInfo ( level );

@@ -63,6 +63,7 @@ struct sBlockMapOptions {
 	bool  HTMLOutput;
 	bool  blockBig;
 	bool autoDetectBacksideRemoval;
+	bool TwoFiftySix;
 };
 
 struct sNodeOptions {
@@ -440,7 +441,7 @@ struct sBlockMapOptions;
 extern sBlockMap *GenerateBLOCKMAP ( DoomLevel *level, int, int, const sBlockMapOptions &options );
 extern int  CreateBLOCKMAP ( DoomLevel *level, sBlockMapOptions &options );
 extern void CreateNODES ( DoomLevel *level, sBSPOptions *options );
-extern bool CreateREJECT ( DoomLevel *level, const sRejectOptions &options, const sBlockMapOptions &blockMapOptions );
+extern bool CreateREJECT ( DoomLevel *level, const sRejectOptions &options, sBlockMapOptions &blockMapOptions );
 extern void HTMLOutput(wBlockMap *map, sBlockMap *blockMap, sBlockList *blockList, const sBlockMapOptions &options, int blockSize, int savings, int totalSize);
 void ProgressBar(char *, double, int, int);
 

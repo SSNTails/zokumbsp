@@ -149,6 +149,7 @@ void printHelp () {
 	fprintf ( stdout, "\nSwitches to control BLOCKMAP strucure in a map.\n\n");
 
 	fprintf ( stdout, "%c -b      Rebuild BLOCKMAP, 8 suboptions.\n", config.BlockMap.Rebuild ? DEFAULT_CHAR : ' ' );
+	fprintf ( stdout, "%c   a     Build a 256x256 BLOCKMAP.\n", config.BlockMap.TwoFiftySix ? DEFAULT_CHAR : ' ' );
 	fprintf ( stdout, "%c   b     Build big 32bit BLOCKMAP, N/A.\n", config.BlockMap.blockBig ? DEFAULT_CHAR : ' ' );
 	fprintf ( stdout, "%c   c     Compress BLOCKMAP.\n", config.BlockMap.Compress ? DEFAULT_CHAR : ' ' );
 	fprintf ( stdout, "%c   h     Output BLOCKMAP data as HTML.\n", config.BlockMap.HTMLOutput ?  DEFAULT_CHAR : ' ' );
@@ -258,6 +259,10 @@ bool parseBLOCKMAPArgs ( char *&ptr, bool setting ) {
 			setting = ( *ptr++ == '+' ) ? true : false;
 		}
 		switch ( option ) {
+			case 'A' :
+				config.BlockMap.TwoFiftySix = true;
+				printf("Using 256x256 blockmap blocks.\n");
+				break;
 			case 'C' : 
 				config.BlockMap.Compress = setting;      
 				break;
@@ -1811,6 +1816,7 @@ bool ProcessLevel ( char *name, wadList *myList, UINT32 *elapsed ) {
 		int oldEfficiency = CheckREJECT ( curLevel );
 
 		UINT32 rejectTime = CurrentTime ();
+		//sBlockMapOptions bmapOptions;
 		bool special = CreateREJECT ( curLevel, config.Reject, config.BlockMap );
 		*elapsed += rejectTime = CurrentTime () - rejectTime;
 

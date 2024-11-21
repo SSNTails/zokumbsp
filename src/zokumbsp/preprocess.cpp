@@ -578,7 +578,7 @@ void MapExtraData( DoomLevel *level, const sOptions *config) {
 				// map01 n doom2.wad has a linedef that partions a sector into two parts, but serves NO purpose
 				if (sectorR == sectorL) {
 					// printf("Linedef %d\n", i);
-					extraData->lineDefsCollidable[i] = false;
+					extraData->lineDefsCollidable[i] = true;
 				} else if (extraData->multiSectorSpecial == false) {
 
 					// two sided linedef, without any action, same floor and ceiling
