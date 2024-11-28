@@ -48,8 +48,8 @@
 
 
 void AddLineDef ( sBlockList *block, int line ) {
-	if (( block->count % 64 ) == 0 ) {
-		int size = ( block->count + 64 ) * sizeof ( int );
+	if (( block->count % (64) ) == 0 ) {
+		int size = ( block->count + (64) ) * sizeof ( int );
 		block->line = ( int * ) realloc ( block->line, size );
 	}
 	block->line [ block->count++ ] = line;
@@ -82,6 +82,7 @@ sBlockMap *GenerateBLOCKMAP ( DoomLevel *level, int xOffset, int yOffset, const 
 
 	const wVertex *vertex   = level->GetVertices();
 	const wLineDefInternal *lineDef = level->GetLineDefs();
+	int blockmapBlockSize = options.TwoFiftySix ? 256 : 128;
 
 	static int xLeft, xRight, yTop, yBottom;
 
@@ -92,8 +93,8 @@ sBlockMap *GenerateBLOCKMAP ( DoomLevel *level, int xOffset, int yOffset, const 
 	yBottom = extraData->bottomVertex - yOffset;
 	yTop = extraData->topVertex;
 
-	int noCols = ( xRight - xLeft ) / 128 + 1;
-	int noRows = ( yTop - yBottom ) / 128 + 1;
+	int noCols = ( xRight - xLeft ) / blockmapBlockSize + 1;
+	int noRows = ( yTop - yBottom ) / blockmapBlockSize + 1;
 	int totalSize = noCols * noRows;
 
 	sBlockList *blockList = new sBlockList [ totalSize ];
@@ -139,8 +140,8 @@ sBlockMap *GenerateBLOCKMAP ( DoomLevel *level, int xOffset, int yOffset, const 
 		long x1 = vertE->x - xLeft;
 		long y1 = vertE->y - yBottom;
 
-		int startX = x0 / 128, startY = y0 / 128;
-		int endX = x1 / 128, endY = y1 / 128;
+		int startX = x0 / blockmapBlockSize, startY = y0 / blockmapBlockSize;
+		int endX = x1 / blockmapBlockSize, endY = y1 / blockmapBlockSize;
 
 		int index = startX + startY * noCols;
 
@@ -196,7 +197,7 @@ sBlockMap *GenerateBLOCKMAP ( DoomLevel *level, int xOffset, int yOffset, const 
 
 				x1 *= dy;
 				int nextX = x0 * dy;
-				int deltaX = ( startY * 128 + 64 * ( 1 + sy ) - y0 ) * dx;
+				int deltaX = ( startY * blockmapBlockSize + (blockmapBlockSize/2) * ( 1 + sy ) - y0 ) * dx;
 
 				bool done = false;
 				int indexSave = index;
@@ -208,7 +209,7 @@ sBlockMap *GenerateBLOCKMAP ( DoomLevel *level, int xOffset, int yOffset, const 
 					nextX += deltaX;
 					if (( sx * sy * nextX ) >= ( sx * sy * x1 )) nextX = x1, done = true;
 
-					int lastIndex = index + nextX / dy / 128 - thisX / dy / 128;
+					int lastIndex = index + nextX / dy / blockmapBlockSize - thisX / dy / blockmapBlockSize;
 
 					AddLineDef ( &blockList [ index ], i );
 					UpdateLineDefBlocks( &blockList [ index ], lineDefLength, 0);
@@ -220,7 +221,7 @@ sBlockMap *GenerateBLOCKMAP ( DoomLevel *level, int xOffset, int yOffset, const 
 					}
 
 					index += sy * noCols;
-					deltaX = ( 128 * dx ) * sy;
+					deltaX = ( blockmapBlockSize * dx ) * sy;
 
 				} while ( ! done );
 
@@ -412,6 +413,8 @@ int CreateBLOCKMAP ( DoomLevel *level, sBlockMapOptions &options ) {
 	sBlockMap *oldBlockMap = NULL;;
 	sBlockMap *bestBlockMap = NULL;
 
+	int blockmapBlockSize = options.TwoFiftySix ? 256 : 128;
+
 	int offsetXMax, offsetXMin, offsetYMax, offsetYMin, offsetIncreaseX, offsetIncreaseY;
 
 	int bestX = -1;
@@ -465,14 +468,14 @@ int CreateBLOCKMAP ( DoomLevel *level, sBlockMapOptions &options ) {
 		offsetXMin = 0;
 		offsetYMin = 0;
 
-		offsetXMax= 127;
-		offsetYMax= 127;
+		offsetXMax= (blockmapBlockSize-1);
+		offsetYMax= (blockmapBlockSize-1);
 
 		offsetIncreaseX = 1;
 		offsetIncreaseY = 1;
 
-		int xSpan = (extraData->rightMostVertex - extraData->leftMostVertex) / 128 + 1;
-		int ySpan = (extraData->topVertex - extraData->bottomVertex) / 128 + 1;
+		int xSpan = (extraData->rightMostVertex - extraData->leftMostVertex) / blockmapBlockSize + 1;
+		int ySpan = (extraData->topVertex - extraData->bottomVertex) / blockmapBlockSize + 1;
 
 		if ( ((float) xSpan / (float) ySpan < 1.15) && ((float) xSpan / (float) ySpan > 0.85)) {
 			// when maps are close to quadratic, we try all offsets.
@@ -500,10 +503,10 @@ int CreateBLOCKMAP ( DoomLevel *level, sBlockMapOptions &options ) {
 		offsetIncreaseX = 8;
 		offsetIncreaseY = 8;
 	} else if (options.OffsetBruteForce){
-		offsetXMax= 127;
+		offsetXMax= (blockmapBlockSize-1);
 		offsetXMin = 0;
 
-		offsetYMax = 127;
+		offsetYMax = (blockmapBlockSize-1);
 		offsetYMin = 0; 
 
 		offsetIncreaseX = 1;
@@ -547,8 +550,8 @@ int CreateBLOCKMAP ( DoomLevel *level, sBlockMapOptions &options ) {
 				int yBottom = extraData->bottomVertex - offsetY;
 				int yTop = extraData->topVertex;
 
-				int noCols = ( xRight - xLeft ) / 128 + 1;
-				int noRows = ( yTop - yBottom ) / 128 + 1;
+				int noCols = ( xRight - xLeft ) / blockmapBlockSize + 1;
+				int noRows = ( yTop - yBottom ) / blockmapBlockSize + 1;
 
 				if (bailout == ( noCols * noRows)) {
 					break;
